@@ -35,4 +35,44 @@
     <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/jquery.js"></script>
 </body>
-</html>
+</html>  
+CREATE TABLE categories (
+  category_id INT PRIMARY KEY,
+  category_name VARCHAR(255),
+  parent_category_id INT,
+  FOREIGN KEY (parent_category_id) REFERENCES categories(category_id) ON DELETE CASCADE
+);
+
+-- Parent Category
+INSERT INTO categories (category_id, category_name, parent_category_id) VALUES (1, 'Electronics', NULL);
+
+-- Sub Category
+INSERT INTO categories (category_id, category_name, parent_category_id) VALUES (2, 'Mobiles', 1);
+
+-- Sub-Sub Category
+INSERT INTO categories (category_id, category_name, parent_category_id) VALUES (3, 'Smartphones', 2);
+
+SELECT 
+    c1.category_id AS id,
+    c1.category_name,
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'id', c2.category_id,
+            'category_name', c2.category_name,
+            'sub_child_category', (
+                SELECT JSON_ARRAYAGG(
+                    JSON_OBJECT('id', c3.category_id, 'category_name', c3.category_name)
+                )
+                FROM categories c3
+                WHERE c3.parent_category_id = c2.category_id
+            )
+        )
+    ) AS sub_category
+FROM 
+    categories c1
+LEFT JOIN 
+    categories c2 ON c1.category_id = c2.parent_category_id
+WHERE 
+    c1.parent_category_id IS NULL
+GROUP BY 
+    c1.category_id, c1.category_name;
