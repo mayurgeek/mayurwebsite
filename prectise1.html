@@ -76,3 +76,7 @@ WHERE
     c1.parent_category_id IS NULL
 GROUP BY 
     c1.category_id, c1.category_name;
+SELECT students.*, subjects.subject_name
+FROM students
+JOIN subjects ON FIND_IN_SET(subjects.subject_id, students.subjects) > 0
+WHERE students.student_id = 'your_student_id';
