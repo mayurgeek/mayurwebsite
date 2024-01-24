@@ -80,3 +80,23 @@ SELECT students.*, subjects.subject_name
 FROM students
 JOIN subjects ON FIND_IN_SET(subjects.subject_id, students.subjects) > 0
 WHERE students.student_id = 'your_student_id';
+
+const Notification = require('./models/Notification');
+const Store = require('./models/Store');
+
+Notification.findAll({
+  include: [
+    {
+      model: Store,
+      required: false, // To make it a LEFT JOIN
+      where: { userId: Sequelize.col('notifications.userId') } // Adjust based on your actual foreign key setup
+    }
+  ]
+})
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+  
